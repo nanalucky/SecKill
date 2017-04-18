@@ -42,16 +42,20 @@ Function getQueryStr(Src, Str)
 	getQueryStr = submatches(1)
 End Function
 
-Function UpdateCookieSecKill(responseText)
-	JSESSIONID_old = GetStrAB(cookieSecKill, "JSESSIONID=", ";")
-	JSESSIONID_new = GetStrAB(responseText, "JSESSIONID=", ";")
-	cookieSecKill = Replace(cookieSecKill, JSESSIONID_old, JSESSIONID_new)
+Function UpdateCookieSecKill(responseHeader)
+	JSESSIONID_new = GetStrAB(responseHeader, "JSESSIONID=", ";")
+	If Len(JSESSIONID_new) > 0 Then
+		JSESSIONID_old = GetStrAB(cookieSecKill, "JSESSIONID=", ";")
+		cookieSecKill = Replace(cookieSecKill, JSESSIONID_old, JSESSIONID_new)
+	End If
 End Function
 
-Function UpdateCookieCaptcha(responseText)
-	JSESSIONID_old = GetStrAB(cookieCaptcha, "JSESSIONID=", ";")
-	JSESSIONID_new = GetStrAB(responseText, "JSESSIONID=", ";")
-	cookieCaptcha = Replace(cookieCaptcha, JSESSIONID_old, JSESSIONID_new)
+Function UpdateCookieCaptcha(responseHeader)
+	JSESSIONID_new = GetStrAB(responseHeader, "JSESSIONID=", ";")
+	If Len(JSESSIONID_new) > 0 Then 
+		JSESSIONID_old = GetStrAB(cookieCaptcha, "JSESSIONID=", ";")
+		cookieCaptcha = Replace(cookieCaptcha, JSESSIONID_old, JSESSIONID_new)
+	End If
 End Function
 
 Rem subSecKill
@@ -88,14 +92,15 @@ Do
 		.setrequestheader "Origin","http://campaign.e-pointchina.com.cn"
 		.setrequestheader "Cookie", cookieSecKill
 		.send body
-	End with
+	End With
+	Delay 100
 
 	If isEmpty(http.responsetext) Then 
 		TracePrint "findSectionGoodsDetailInfo 失败，重新发送"
 	Else 
 		response = http.responsetext
 		errorCode = GetStrAB(response, "<errorCode>", "</errorCode>")
-		UpdateCookieSecKill(response)
+		UpdateCookieSecKill(http.GetAllResponseHeaders())
 		If errorCode <> "0" Then
 			errorMsg = GetStrAB(response, "<errorMsg>", "</errorMsg>")
 			TracePrint "findSectionGoodsDetailInfo (" &errorMsg& ")，重新发送"
@@ -205,7 +210,7 @@ If IsEmpty(http.responseText) Then
 End If
 
 response = http.responsetext
-UpdateCookieCaptcha(response)
+UpdateCookieCaptcha(http.GetAllResponseHeaders())
 responseNewCaptcha = GetStrAB(response, jsonpReturn & " = """, """")
 responseNewCaptcha = decodeURI(responseNewCaptcha)
 result = GetStrAB(responseNewCaptcha, "<result>", "</result>")
