@@ -53,7 +53,15 @@ End Function
 Function UpdateCookieCaptcha(responseHeader)
 	JSESSIONID_new = GetStrAB(responseHeader, "JSESSIONID=", ";")
 	If Len(JSESSIONID_new) > 0 Then 
-		JSESSIONID_old = GetStrAB(cookieCaptcha, "JSESSIONID=", ";")
+		set regEx = New RegExp
+		regEx.[Global] = TRUE
+		regEx.IgnoreCase = FALSE
+		regEx.pattern = "JSESSIONID=(.*)"
+		Set matches = regEx.execute(cookieCaptcha)
+		For Each match In matches
+			JSESSIONID_old = match.SubMatches(0)
+			Exit For	
+		Next
 		cookieCaptcha = Replace(cookieCaptcha, JSESSIONID_old, JSESSIONID_new)
 	End If
 End Function
@@ -103,7 +111,7 @@ Do
 		UpdateCookieSecKill(http.GetAllResponseHeaders())
 		If errorCode <> "0" Then
 			errorMsg = GetStrAB(response, "<errorMsg>", "</errorMsg>")
-			TracePrint "findSectionGoodsDetailInfo (" &errorMsg& ")，重新发送"
+			TracePrint "findSectionGoodsDetailInfo (" & errorMsg & ")，重新发送"
 		Else
 			Exit Do
 		End If
@@ -155,7 +163,8 @@ Do
 		.setrequestheader "Origin","http://campaign.e-pointchina.com.cn"
 		.setrequestheader "Cookie", cookieSecKill
 		.send body
-	End with
+	End With
+	Delay 100
 
 	If isEmpty(http.responsetext) Then 
 		TracePrint "prepareSeckill 失败，重新发送"
@@ -164,7 +173,7 @@ Do
 		errorCode = GetStrAB(response, "<errorCode>", "</errorCode>")
 		If errorCode <> "0" Then
 			errorMsg = GetStrAB(response, "<errorMsg>", "</errorMsg>")
-			TracePrint "prepareSeckill (" &errorMsg& ")，重新发送"
+			TracePrint "prepareSeckill (" & errorMsg & ")，重新发送"
 		Else
 			app = paramAppId
 			userId = paramUserId
@@ -208,9 +217,10 @@ If IsEmpty(http.responseText) Then
 	TracePrint "newcaptcha 失败，重新发送"
 	Goto subcaptcha
 End If
+Delay 100
 
 response = http.responsetext
-UpdateCookieCaptcha(http.GetAllResponseHeaders())
+UpdateCookieCaptcha (http.GetAllResponseHeaders())
 responseNewCaptcha = GetStrAB(response, jsonpReturn & " = """, """")
 responseNewCaptcha = decodeURI(responseNewCaptcha)
 result = GetStrAB(responseNewCaptcha, "<result>", "</result>")
@@ -266,7 +276,6 @@ For Each match In matches
 	count = count + 1
 Next
 
-
 // verifyCaptcha
 counterReturn = counterReturn + 1
 counterCallback = counterCallback + 1
@@ -295,7 +304,7 @@ responseVerifyCaptcha = GetStrAB(response, jsonpReturn & " = """, """")
 responseVerifyCaptcha = decodeURI(responseVerifyCaptcha)
 result = GetStrAB(responseVerifyCaptcha, "<result>", "</result>")
 If result <> "success" Then
-	TracePrint "verifyCaptcha result(" &result& ")，重新发送"
+	TracePrint "verifyCaptcha result(" & result & ")，重新发送"
 	Goto subcaptcha
 End If
 
@@ -303,7 +312,7 @@ captchaPass = GetStrAB(responseVerifyCaptcha, "<captchaPass>", "</captchaPass>")
 
 
 // doSecKill
-body = "channelId=" &paramChannelId& "&appId=" &paramAppId& "&authTicket=" &cookieAuthTicket& "&userId=" &paramUserId& "&sign=" &paramSign& "&sectionId=" &paramSectionId& "&goodsId=" &paramGoodsId& "&goodsSku=&lastCardNo=&captchaId=" &captchaId& "&captchaPass=" &captchaPass& "&appTimestamp=" &appTimestamp& "&appToken=" &accessToken& "&serviceType=com.ebuy.o2o.campaign.service.SeckillService&serviceMethod=doSeckill"
+body = "channelId=" &paramChannelId& "&appId=" &paramAppId& "&authTicket=" &cookieAuthTicket& "&userId=" &paramUserId& "&sign=" &paramSign& "&sectionId=" &paramSectionId& "&goodsId=" &paramGoodsId& "&goodsSku=&lastCardNo=&captchaId=" &captchaId& "&captchaPass=" &captchaPass& "&appTimestamp=" &appTimestamp& "&appToken=" &appToken& "&serviceType=com.ebuy.o2o.campaign.service.SeckillService&serviceMethod=doSeckill"
 Set http = CreateObject("WinHttp.WinHttpRequest.5.1")
 With http
 	.Setproxy 2,"127.0.0.1:8888",0
