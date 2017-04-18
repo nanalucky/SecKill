@@ -42,20 +42,6 @@ Function getQueryStr(Src, Str)
 	getQueryStr = submatches(1)
 End Function
 
-Function getStrABList(Src, StrA, StrB)
-	Dim regEx, Matches, Match
-	set regEx = New RegExp
-	regEx.[Global] = TRUE
-	regEx.IgnoreCase = FALSE
-	regEx.pattern = "<" &StrA& ">(.+)<" &StrB& ">"
-	Set matches = regEx.execute(Src)
-	Dim count
-	count = 0
-	For Each Match In Matches
-		getStrABList(count) = Match
-	Next
-End Function
-
 Function UpdateCookieSecKill(responseText)
 	JSESSIONID_old = GetStrAB(cookieSecKill, "JSESSIONID=", ";")
 	JSESSIONID_new = GetStrAB(responseText, "JSESSIONID=", ";")
@@ -260,8 +246,21 @@ end with
 Dim Var
 Var = Plugin.Sunday.GetCodeFromFile("C:\raw\verify.jpg", "qq3432872")
 Var = Var + 0
-stringList = getStrABList(responseNewCaptcha, "<String>", "</String>")
-answerId = stringList(var)
+set regEx = New RegExp
+regEx.[Global] = TRUE
+regEx.IgnoreCase = FALSE
+regEx.pattern = "<String>(.+)</String>"
+Set matches = regEx.execute(str)
+Dim count
+count = 0
+For Each match In matches
+	If count = Var Then
+		answerId = match.SubMatches(0)
+		Exit For
+	End If
+	count = count + 1
+Next
+
 
 // verifyCaptcha
 counterReturn = counterReturn + 1
