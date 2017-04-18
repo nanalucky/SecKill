@@ -206,7 +206,7 @@ End If
 
 response = http.responsetext
 UpdateCookieCaptcha(response)
-responseNewCaptcha = GetStrAB(response, jsonpReturn & ' = "', '"')
+responseNewCaptcha = GetStrAB(response, jsonpReturn & " = """, """")
 responseNewCaptcha = decodeURI(responseNewCaptcha)
 result = GetStrAB(responseNewCaptcha, "<result>", "</result>")
 If result <> "success" Then
@@ -286,7 +286,7 @@ if isEmpty(http.responsetext) Then
 End If
 
 response = http.responsetext
-responseVerifyCaptcha = GetStrAB(response, jsonpReturn & ' = "', '"')
+responseVerifyCaptcha = GetStrAB(response, jsonpReturn & " = """, """")
 responseVerifyCaptcha = decodeURI(responseVerifyCaptcha)
 result = GetStrAB(responseVerifyCaptcha, "<result>", "</result>")
 If result <> "success" Then
@@ -315,10 +315,10 @@ With http
 	.send body
 End with
 
-If isEmpty(http.responsetext) Then
+if isEmpty(http.responsetext) Then
 	TracePrint "doSecKill 失败，重新发送"
 	Goto subSecKill
-End
+End If
 response = http.responsetext
 errorCode = GetStrAB(response, "<errorCode>", "</errorCode>")
 If errorCode <> "0" Then
@@ -328,7 +328,7 @@ If errorCode <> "0" Then
 End If
 orderId = GetStrAB(response, "<orderId>", "</orderId>")
 status = GetStrAB(response, "<status>", "</status>")
-If orderId = '1' Then
+If orderId = "1" Then
 	TracePrint "抢兑成功"
 End If
 
