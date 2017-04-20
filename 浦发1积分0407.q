@@ -67,7 +67,7 @@ Function UpdateCookieCaptcha(responseHeader)
 End Function
 
 Rem subSecKill
-Text1 = Plugin.File.ReadFileEx("C:\raw\0413.txt")
+Text1 = Plugin.File.ReadFileEx("C:\raw\0419.txt")
 href = GetStrAB(text1, "GET ", " HTTP/1.1")
 cookieSecKill = GetStrAB(text1, "Cookie: ", "X-Requested-With")
 cookieSecKill = Replace(cookieSecKill, "\r", "")
@@ -173,7 +173,7 @@ Do
 		errorCode = GetStrAB(response, "<errorCode>", "</errorCode>")
 		If errorCode <> "0" Then
 			errorMsg = GetStrAB(response, "<errorMsg>", "</errorMsg>")
-			TracePrint "prepareSeckill (" & errorMsg & ")，重新发送"
+ 			TracePrint "prepareSeckill (" & errorMsg & ")，重新发送"
 		Else
 			app = paramAppId
 			userId = paramUserId
@@ -265,7 +265,7 @@ set regEx = New RegExp
 regEx.[Global] = TRUE
 regEx.IgnoreCase = FALSE
 regEx.pattern = "<String>(.+)</String>"
-Set matches = regEx.execute(str)
+Set matches = regEx.execute(responseNewCaptcha)
 Dim count
 count = 0
 For Each match In matches
