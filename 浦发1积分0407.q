@@ -9,7 +9,7 @@ StopHotkeyMod=0
 RunOnce=1
 EnableWindow=
 MacroID=27fec89a-a1fd-44fb-8b6c-c5a943fb314a
-Description=浦发1积分成品0407每次修改goodsid
+Description=SPDB0511
 Enable=0
 AutoRun=0
 [Repeat]
@@ -65,9 +65,28 @@ Function UpdateCookieCaptcha(responseHeader)
 		cookieCaptcha = Replace(cookieCaptcha, JSESSIONID_old, JSESSIONID_new)
 	End If
 End Function
+n = Lib.文件.遍历指定目录下所有文件名("C:\Users\Administrator\Desktop")
 
+m = UBound(n)
+
+
+For i = 0 To m
+    If instr(n(i), "txt") > 0 Then 
+        filename = n(i)
+        TracePrint filename
+    End If
+Next
+mytime = "13:59:55"
+Do
+    TracePrint "NowTime="&time
+    If cdate(mytime) <= time Then 
+        Exit Do
+    Else 
+        Delay 100
+    End If
+Loop
 Rem subSecKill
-Text1 = Plugin.File.ReadFileEx("C:\raw\0419.txt")
+Text1 = Plugin.File.ReadFileEx("C:\Users\Administrator\Desktop\"&filename)
 href = GetStrAB(text1, "GET ", " HTTP/1.1")
 cookieSecKill = GetStrAB(text1, "Cookie: ", "X-Requested-With")
 cookieSecKill = Replace(cookieSecKill, "\r", "")
